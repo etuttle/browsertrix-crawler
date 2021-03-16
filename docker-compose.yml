@@ -6,6 +6,9 @@ services:
         build:
           context: ./
 
+        ports:
+          - 9037:9037
+
         volumes:
           - ./crawls:/crawls
 

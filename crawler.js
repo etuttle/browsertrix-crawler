@@ -27,6 +27,8 @@ const HTTPS_AGENT = require("https").Agent({
 
 const HTTP_AGENT = require("http").Agent();
 
+const { ScreenCaster } = require("./screencaster");
+
 
 // ============================================================================
 class Crawler {
@@ -430,6 +432,7 @@ class Crawler {
     // Puppeter Options
     return {
       headless: this.params.headless,
+      defaultViewport: null,
       executablePath: CHROME_PATH,
       ignoreHTTPSErrors: true,
       args: this.chromeArgs,
@@ -467,6 +470,10 @@ class Crawler {
 
   async crawlPage({page, data}) {
     try {
+      if (this.screencaster) {
+        await this.screencaster.newTarget(page.target());
+      }
+
       if (this.emulateDevice) {
         await page.emulate(this.emulateDevice);
       }
@@ -495,6 +502,10 @@ class Crawler {
       }
 
       this.writeStats();
+
+      if (this.screencaster) {
+        await this.screencaster.endTarget(page.target());
+      }
 
     } catch (e) {
       console.warn(e);
@@ -545,6 +556,8 @@ class Crawler {
     this.cluster.task((opts) => this.crawlPage(opts));
 
     this.initPages();
+
+    this.screencaster = new ScreenCaster(this.cluster);
 
     this.queueUrl(this.params.url);
 
