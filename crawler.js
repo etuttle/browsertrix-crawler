@@ -27,7 +27,7 @@ const HTTPS_AGENT = require("https").Agent({
 
 const HTTP_AGENT = require("http").Agent();
 
-const { ScreenCaster } = require("./screencaster");
+const { ScreenCaster, NewWindowPage } = require("./screencaster");
 
 
 // ============================================================================
@@ -425,6 +425,7 @@ class Crawler {
       "--autoplay-policy=no-user-gesture-required",
       "--disable-features=IsolateOrigins,site-per-process",
       "--disable-popup-blocking"
+      "--disable-backgrounding-occluded-windows",
     ];
   }
 
@@ -478,9 +479,10 @@ class Crawler {
         await page.emulate(this.emulateDevice);
       }
 
-      if (this.behaviorOpts) {
+      if (this.behaviorOpts && !page.__bx_inited) {
         await page.exposeFunction(BEHAVIOR_LOG_FUNC, (logdata) => this._behaviorLog(logdata));
         await page.evaluateOnNewDocument(behaviors + `;\nself.__bx_behaviors.init(${this.behaviorOpts});`);
+        page.__bx_inited = true;
       }
 
       // run custom driver here
@@ -542,9 +544,11 @@ class Crawler {
       return;
     }
 
+    const concurrency = this.params.newContext === Cluster.CONCURRENCY_PAGE ? NewWindowPage : this.params.newContext;
+
     // Puppeteer Cluster init and options
     this.cluster = await Cluster.launch({
-      concurrency: this.params.newContext,
+      concurrency,
       maxConcurrency: this.params.workers,
       skipDuplicateUrls: true,
       timeout: this.params.timeout * 2,

@@ -3,8 +3,12 @@ const http = require("http");
 const url = require("url");
 const fs = require("fs");
 
+const SingleBrowserImplementation = require('puppeteer-cluster/dist/concurrency/SingleBrowserImplementation').default;
+
 const indexHTML = fs.readFileSync("/app/screencast/index.html", {encoding: "utf8"});
 
+
+// ===========================================================================
 class ScreenCaster
 {
   constructor(cluster) {
@@ -86,7 +90,6 @@ class ScreenCaster
     this.sendAll({"msg": "newTarget", id, url});
 
     cdp.on("Page.screencastFrame", async (resp) => {
-      console.log("cdp", cdp._sessionId, resp.sessionId);
       const data = resp.data;
       const sessionId = resp.sessionId;
 
@@ -158,4 +161,69 @@ class ScreenCaster
   }
 }
 
-module.exports = { ScreenCaster };
+
+// ===========================================================================
+class NewWindowPage extends SingleBrowserImplementation {
+  async init() {
+    await super.init();
+
+    this.newTargets = [];
+
+    this.nextPromise();
+
+    this.mainPage = await this.browser.newPage();
+
+    this.pages = [];
+    this.reuse = true;
+
+    await this.mainPage.goto("about:blank");
+
+    this.mainTarget = this.mainPage.target();
+
+    this.browser.on("targetcreated", (target) => {
+      if (this._nextTarget && target.opener() === this.mainTarget) {
+        this.newTargets.push(target);
+        this._nextTarget();
+        this.nextPromise();
+        console.log("got new target");
+      }
+    });
+  }
+
+  nextPromise() {
+    this._nextPromise = new Promise((resolve) => this._nextTarget = resolve);
+  }
+
+  async getNewPage() {
+    console.log("new window");
+
+    const p = this._nextPromise;
+
+    await this.mainPage.evaluate("window.open('about:blank', '', 'resizable');");
+
+    await p;
+
+    const target = this.newTargets.shift();
+
+    return {page: await target.page() };
+  }
+
+  async createResources() {
+    if (this.pages.length) {
+      return {page: this.pages.shift()};
+    }
+    return await this.getNewPage();
+  }
+
+  async freeResources(resources) {
+    if (this.reuse) {
+      this.pages.push(resources.page);
+    } else {
+      await resources.page.close();
+    }
+  }
+}
+
+
+
+module.exports = { ScreenCaster, NewWindowPage };
