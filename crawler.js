@@ -237,7 +237,7 @@ class Crawler {
         alias: ["urlfilelist", "urlFILELIST"],
         describe: "If set, read a list of urls from the passed file. The default file name is urlSeedFile.txt",
         type: "string",
-        default: path.join(__dirname, "urlSeedFile.txt"),
+        default: "",
       },
       
       "logging": {
@@ -534,8 +534,8 @@ class Crawler {
 
     this.initPages();
 
-    if (this.params.urlFileList) {
-      let urlSeedFile = fs.readFileSync(this.params.urlFileList, "utf-8");
+    if (this.params.urlFileList != '') {
+      let urlSeedFile = fs.readFileSync( path.join(__dirname, this.params.urlFileList), "utf-8");
       this.queueUrls(urlSeedFile);
     }
     
