@@ -534,7 +534,7 @@ class Crawler {
 
     this.initPages();
 
-    if (this.params.urlFileList != '') {
+    if (this.params.urlFileList != "") {
       let urlSeedFile = fs.readFileSync( path.join(__dirname, this.params.urlFileList), "utf-8");
       this.queueUrls(urlSeedFile);
     }
