@@ -41,6 +41,7 @@ RUN yarn install
 ADD config.yaml /app/
 ADD uwsgi.ini /app/
 ADD *.js /app/
+ADD *.txt /app/
 
 RUN ln -s /app/main.js /usr/bin/crawl
 

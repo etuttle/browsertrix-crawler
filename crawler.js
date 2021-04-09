@@ -233,6 +233,13 @@ class Crawler {
         default: false,
       },
       
+      "urlFileList": {
+        alias: ["urlfilelist", "urlFILELIST"],
+        describe: "If set, read a list of urls from the passed file. The default file name is urlSeedFile.txt",
+        type: "string",
+        default: path.join(__dirname, "urlSeedFile.txt"),
+      },
+      
       "logging": {
         describe: "Logging options for crawler, can include: stats, pywb, behaviors",
         type: "string",
@@ -527,6 +534,11 @@ class Crawler {
 
     this.initPages();
 
+    if (this.params.urlFileList) {
+      let urlSeedFile = fs.readFileSync(this.params.urlFileList, "utf-8");
+      this.queueUrls(urlSeedFile);
+    }
+    
     this.queueUrl(this.params.url);
 
     if (this.params.useSitemap) {
