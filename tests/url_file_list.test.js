@@ -7,9 +7,9 @@ test("check that all urls in a file list are crawled when the filelisturl param 
 
   try{
 
-    let testtest = fs.readdirSync("tests/fixtures");
+    let testtest = fs.readFileSync("tests/fixturesurlSeedFile.txt");
     console.log(testtest);
-    await exec("docker-compose run crawler crawl --url http://www.example.com/ --collection filelisttest --urlFileList ./tests/fixtures/urlSeedFile.txt");
+    await exec("docker-compose run crawler crawl --url http://www.example.com/ --collection filelisttest --urlFileList fixtures/urlSeedFile.txt");
     
   }
   catch (error) {
