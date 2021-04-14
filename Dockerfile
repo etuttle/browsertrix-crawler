@@ -44,6 +44,7 @@ ADD *.js /app/
 ADD *.txt /app/
 
 RUN ln -s /app/main.js /usr/bin/crawl
+RUN ln -s /app/create-login-profile.js /usr/bin/create-login-profile
 
 WORKDIR /crawls
 
