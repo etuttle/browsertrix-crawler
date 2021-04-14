@@ -43,7 +43,7 @@ ADD uwsgi.ini /app/
 ADD *.js /app/
 
 ADD *.txt /app/
-COPY tests/fixtures /app/fixtures
+COPY tests/fixtures/ /app/fixtures
 
 RUN ln -s /app/main.js /usr/bin/crawl
 RUN ln -s /app/create-login-profile.js /usr/bin/create-login-profile
