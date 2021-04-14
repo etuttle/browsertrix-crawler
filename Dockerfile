@@ -37,14 +37,13 @@ ADD package.json /app/
 ARG REBUILD
 
 RUN yarn install
-
+COPY tests/fixtures/* /app/fixtures/
 ADD config.yaml /app/
 ADD uwsgi.ini /app/
 ADD *.js /app/
-
 ADD *.txt /app/
-COPY tests/fixtures/ /app/fixtures
 
+RUN ls fixtures
 RUN ln -s /app/main.js /usr/bin/crawl
 RUN ln -s /app/create-login-profile.js /usr/bin/create-login-profile
 
