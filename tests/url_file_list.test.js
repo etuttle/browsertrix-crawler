@@ -6,7 +6,7 @@ test("check that all urls in a file list are crawled when the filelisturl param 
   jest.setTimeout(30000);
 
   try{
-    await exec("docker-compose run crawler crawl --url http://www.example.com/ --collection filelisttest --urlFileList fixtures/urlSeedFile.txt");
+    await exec("docker-compose run crawler crawl --url http://www.example.com/ --collection filelisttest --urlFileList tests/fixtures/urlSeedFile.txt");
   }
   catch (error) {
     console.log(error);
