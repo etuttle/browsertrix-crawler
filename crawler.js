@@ -288,6 +288,12 @@ class Crawler {
         describe: "Path to tar.gz file which will be extracted and used as the browser profile",
         type: "string",
       },
+
+      "screencastPort": {
+        describe: "If set to a non-zero value, starts an HTTP server with screencast accessible on this port",
+        type: "number",
+        default: 0
+      }
     };
   }
 
@@ -424,7 +430,7 @@ class Crawler {
       "--disable-background-media-suspend",
       "--autoplay-policy=no-user-gesture-required",
       "--disable-features=IsolateOrigins,site-per-process",
-      "--disable-popup-blocking"
+      "--disable-popup-blocking",
       "--disable-backgrounding-occluded-windows",
     ];
   }
@@ -561,7 +567,9 @@ class Crawler {
 
     this.initPages();
 
-    this.screencaster = new ScreenCaster(this.cluster);
+    if (this.params.screencastPort) {
+      this.screencaster = new ScreenCaster(this.cluster, this.params.screencastPort);
+    }
 
     this.queueUrl(this.params.url);
 

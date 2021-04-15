@@ -2,12 +2,9 @@ version: '3.5'
   
 services:
     crawler:
-        image: webrecorder/browsertrix-crawler:0.3.0
+        image: webrecorder/browsertrix-crawler:0.4.0-beta.0
         build:
           context: ./
-
-        ports:
-          - 9037:9037
 
         volumes:
           - ./crawls:/crawls

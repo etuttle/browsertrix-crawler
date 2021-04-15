@@ -11,7 +11,7 @@ const indexHTML = fs.readFileSync("/app/screencast/index.html", {encoding: "utf8
 // ===========================================================================
 class ScreenCaster
 {
-  constructor(cluster) {
+  constructor(cluster, port) {
     this.cluster = cluster;
 
     this.httpServer = http.createServer((req, res) => {
@@ -45,7 +45,8 @@ class ScreenCaster
       }
     });
 
-    this.httpServer.listen(9037);
+    this.httpServer.listen(port);
+    console.log(`Screencast Server started on: ${port}`);
   }
 
   initWS(ws) {
