@@ -96,7 +96,9 @@ async function main() {
 
   console.log("loading");
 
-  await page.goto(params.url, {waitUntil});
+  for (var i=0; i<params.urls.length; i++) {
+    await page.goto(params.urls[i], {waitUntil});
+  }
 
   console.log("loaded");
 

@@ -144,9 +144,9 @@ class Crawler {
 
   get cliOpts() {
     return {
-      "url": {
-        alias: "u",
-        describe: "The URL to start crawling from",
+      urls: {
+        alias: ["url", "u"],
+        describe: "The URLs to start crawling from",
         type: "string",
         demandOption: true,
       },
@@ -300,11 +300,16 @@ class Crawler {
   }
 
   validateArgs(argv) {
-    if (argv.url) {
-      // Scope for crawl, default to the domain of the URL
-      // ensure valid url is used (adds trailing slash if missing)
-      //argv.seeds = [Crawler.validateUserUrl(argv.url)];
-      argv.url = this.validateUserUrl(argv.url);
+    if (argv.urls) {
+      if (typeof argv.exclude === "string") {
+        argv.urls = [this.validateUserUrl(argv.urls)];
+      } else {
+        argv.urls = argv.urls.map((u) => {
+          return this.validateUserUrl(u);
+        });
+      }
+    } else {
+      throw new Error("One or more URLs is required.");
     }
 
     if (!argv.scope) {
@@ -374,7 +379,7 @@ class Crawler {
     }
 
     if (argv.useSitemap === true) {
-      const url = new URL(argv.url);
+      const url = new URL(argv.urls[0]);
       url.pathname = "/sitemap.xml";
       argv.useSitemap = url.href;
     }
@@ -546,7 +551,12 @@ class Crawler {
 
     this.initPages();
 
-    this.queueUrl(this.params.url);
+    // This.queueUrl is for a URL from the user as opposed to a discovered URL
+    // so this is appropriate.  One use case is an odd site where the nav uses #anchors, which are stripped by queueUrls
+    for (var i = 0; i < this.params.urls.length; i++) {
+      console.log("enqueing " + this.params.urls[i]);
+      this.queueUrl(this.params.urls[i]);
+    }
 
     if (this.params.useSitemap) {
       await this.parseSitemap(this.params.useSitemap);
@@ -741,10 +751,17 @@ class Crawler {
 
   async isHTML(url) {
     try {
-      const resp = await fetch(url, {
+      console.log("testing URL " + url);
+      const headUrl = ((u) => {
+        const p = new URL(u);
+        p.hash = "";
+        return p.href;
+      })(url);
+      console.log("result is headUrl" + headUrl);
+      const resp = await fetch(headUrl, {
         method: "HEAD",
         headers: this.headers,
-        agent: this.resolveAgent
+        agent: this.resolveAgent,
       });
 
       if (resp.status >= 400) {
