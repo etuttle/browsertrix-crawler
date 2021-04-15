@@ -37,7 +37,7 @@ ADD package.json /app/
 ARG REBUILD
 
 RUN yarn install
-COPY tests/fixtures/* /app/fixtures/
+ADD tests/fixtures/ /app/fixtures/
 ADD config.yaml /app/
 ADD uwsgi.ini /app/
 ADD *.js /app/
