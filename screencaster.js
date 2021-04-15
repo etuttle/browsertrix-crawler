@@ -3,7 +3,7 @@ const http = require("http");
 const url = require("url");
 const fs = require("fs");
 
-const SingleBrowserImplementation = require('puppeteer-cluster/dist/concurrency/SingleBrowserImplementation').default;
+const SingleBrowserImplementation = require("puppeteer-cluster/dist/concurrency/SingleBrowserImplementation").default;
 
 const indexHTML = fs.readFileSync("/app/screencast/index.html", {encoding: "utf8"});
 
@@ -33,14 +33,14 @@ class ScreenCaster
 
     this.wss = new ws.Server({ noServer: true });
 
-    this.wss.on('connection', (ws) => this.initWS(ws));
+    this.wss.on("connection", (ws) => this.initWS(ws));
 
-    this.httpServer.on('upgrade', (request, socket, head) => {
+    this.httpServer.on("upgrade", (request, socket, head) => {
       const pathname = url.parse(request.url).pathname;
 
-      if (pathname === '/ws') {
+      if (pathname === "/ws") {
         this.wss.handleUpgrade(request, socket, head, (ws) => {
-          this.wss.emit('connection', ws, request);
+          this.wss.emit("connection", ws, request);
         });
       }
     });
@@ -145,7 +145,7 @@ class ScreenCaster
     const promises = [];
 
     for (const cdp of this.targets.values()) {
-       promises.push(this.startCast(cdp));
+      promises.push(this.startCast(cdp));
     }
 
     return Promise.allSettled(promises);
@@ -155,7 +155,7 @@ class ScreenCaster
     const promises = [];
 
     for (const cdp of this.targets.values()) {
-       promises.push(this.stopCast(cdp));
+      promises.push(this.stopCast(cdp));
     }
 
     return Promise.allSettled(promises);

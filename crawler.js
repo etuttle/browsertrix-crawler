@@ -444,7 +444,6 @@ class Crawler {
       ignoreHTTPSErrors: true,
       args: this.chromeArgs,
       userDataDir: this.profileDir,
-      defaultViewport: null,
     };
   }
 
